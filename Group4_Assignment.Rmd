@@ -1,0 +1,706 @@
+---
+title: "Income and Overweight in Four Dutch Cities"
+subtitle: "Amsterdam, Utrecht, Groningen and Maastricht, 2012–2022"
+author: |
+  Baylan Lanzaat 2863830; Sietse van Dijk 2896106; Abel Middel 2786769  
+  Max Mooij 2901266; Pol Schuurman 2900948
+date: "23 June 2026"
+output: pdf_document
+fontsize: 10pt
+geometry: margin=2cm
+---
+**Tutorial group:** CPR03  
+**Tutorial lecturer:** Chantal Schouwenaar
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center",
+  out.width = "85%"
+)
+
+library(tidyverse)
+library(maps)
+library(sf)
+```
+
+## 1.1 Describe the Social Problem
+Being overweight is a significant public health problem in the Netherlands. Overweight in the Netherlands is having a Body Mass Index (BMI) of 25 or higher. In 2023, over half of the Dutch population with an age of 20 and older was overweight while 16% had obesity. Obesity is defined as a BMI of 30 or higher (RIVM, 2024). The high number of people affected by overweight makes it a key social issue, as it is linked to negative health effects and poses challenges for public health policy. Overweight is not equally distributed across Dutch society. We found on CBS that between 2018 and 2021, 56% of adults with an income below the low-income threshold were overweight and 51% of adults with a high income. Obesity was also more common among adults with a low income: 19% of adults in this group had obesity, while 15% of adults above the low-income threshold had obesity (CBS, 2022). These findings suggest that overweight is not just an individual health issue, but may also relate to wider socioeconomic inequalities. Several factors have influence on the link between income and overweight. People with more financial resources often have better access to healthy food, sports facilities, and healthcare. However, income is not the only factor that can affect overweight rates. Education, age, demographics, working conditions, and lifestyle choices may also lead to differences between population groups and cities. In Dutch cities the average income levels and public health outcomes varies. We did research ont the connection between income and overweight at different places in the Netherlands so we can reveal whether socioeconomic differences relate to geographical health inequalities. This information can help municipalities in finding where public health programs, such as accessible sports initiatives or healthy food campaigns, could be most effective. In our research we look at the relationship between average income and overweight prevalence in Amsterdam, Utrecht, Maastricht, and Groningen for the years 2012, 2016, 2020, and 2022. It investigates whether city-year observations with lower average income tend to have higher overweight prevalence. Also, we look at whether overweight trends changed differently across the four cities over time. Also, we look at the patterns observed around 2020, the year when the COVID-19 outbreak was declared a pandemic (World Health Organization, 2020). The analysis has several notable limitations. First, we used average values at the city level and this is why a link between income and overweight at this level does not necessarily mean that individual residents with lower incomes are more likely to be overweight. Second, the study includes only four cities and four measurement years, so the results cannot be automatically applied to all Dutch municipalities. Finally, changes observed around 2020 cannot definitively be attributed to the COVID-19 pandemic. Other factors, such as demographic shifts, inflation, local policies, or changes in data collection methods, may also have influenced the results. We expect that city-year observations with lower average income will generally show a higher prevalence of overweight. 
+
+### Research question
+To what extent is average standardized household income related to overweight prevalence in Amsterdam, Utrecht, Maastricht, and Groningen between 2012 and 2022, and how did overweight prevalence change around the start of the COVID-19 pandemic? 
+
+
+# Part 2 – Data Sourcing
+
+### Description and limitations
+This study uses publicly available data from the Netherlands Central Bureau of Statistics (CBS), to examine the relationship between household income and overweight prevalence in four Dutch cities: Amsterdam, Utrecht, Groningen and Maastricht. 
+The final dataset contains observations for 2012, 2016, 2020 and 2022. The unit of observation is a city-year combination, meaning that each row represents one city in one measurement year. The four measurement years were selected because the regular health monitor was conducted in 2012, 2016 and 2020, while an additional corona health monitor was conducted in 2022. 
+The overweight data were obtained from the health monitor for adults and older people. The health monitor is jointly conducted by the Dutch municipal health services (GGD), the national institute for public health and the environment (RIVM) and statistics Netherlands (CBS). It is a large-scale questionnaire study that collects information about the health, social situation and lifestyle of residents living in private households. Separate editions of the health monitor were used for 2012, 2016, 2020 and 2022. 
+Overweight is determined using the Body Mass Index (BMI), which is calculated by dividing a person’s weight in kilograms by the square of their height in metres. The analysis uses the total overweight variable published by CBS, defined as the percentage of residents with a BMI of 25 or higher. Severe overweight (or obesity), represents the percentage of residents with a BMI of 30 or higher. For the comparison in Section 3.5, moderate overweight is calculated by subtracting severe overweight from total overweight prevalence. 
+The income data were obtained from the CBS StatLine table income of households; household characteristics and region. This dataset contains income information for private households, separated by year and geographical region. This study uses average standardised disposable household income, reported in thousands of euros. Standardised income is adjusted for differences in household size and composition, making the economic welfare of different types of households more comparable.
+The health and income data were subsequently matched using municipality and year. Several limitations must be considered. First, the health monitor is based on a sample and questionnaire responses rather than measurements of every resident. The reported percentages may therefore contain sampling uncertainty and reporting errors. Second, the target population changed slightly across the measurement years. The 2012 and 2016 surveys focused on residents aged 19 years or older, whereas the 2020 and 2022 surveys focused on residents aged 18 years or older. This difference may have a tiny influence on comparisons over time. Third, the 2022 measurement was an additional health monitor conducted during the COVID-19 period rather than a regular four-year measurement. The circumstances and timing of this survey may therefore affect its comparability with earlier years although discussed further in 3.6. Fourth, standardised income corrects for household size and composition but is not necessarily corrected for inflation. Part of the increase in income over time may therefore reflect changing price levels rather than an increase in purchasing power. Finally, the analysis uses averages at the city level. A relationship between average income and overweight prevalence at the city level does not prove that individual residents with lower incomes are more likely to be overweight. The study is also limited to four cities and four measurement years, resulting in a relatively small number of city-year observations.
+
+## 2.1 Load in the data
+The cleaned dataset was loaded from data/data_clean.csv. The loading code is included in the RMarkdown file but hidden from the final report.
+```{r load-data, include=FALSE}
+data_clean <- read_csv(
+  "data/data_clean.csv",
+  show_col_types = FALSE
+)
+```
+
+## 2.2 Provide a short summary of the dataset(s)
+The final dataset contains 16 observations and five variables. Each observation represents one municipality in one measurement year. The dataset covers: Amsterdam, Groningen, Maastricht and Utrecht in 2012, 2016, 2020 and 2022.
+```{r dataset-summary}
+
+
+
+```
+## 2.3 Describe the type of variables included
+The merged dataset contains both socioeconomic and health information. The variable `gem_gestand_inkomen` is a socioeconomic variable and represents the average standardised household income in thousands of euros. Standardisation accounts for differences in household size and composition.
+The variables `overgewicht_totaal` and `ernstig_overgewicht` contain health information. Total overweight represents the percentage of residents with a BMI of 25 or higher, while severe overweight represents the percentage of residents with a BMI of 30 or higher.
+The income information is based on administrative data collected by CBS. The overweight information comes from the Dutch Health Monitor and is based on questionnaire responses from a sample of residents. Therefore, the income and health variables were collected using different methods.
+
+```{r variable-table}
+variable_table <- tibble(
+  Variable = c(
+    "regio",
+    "jaar",
+    "gem_gestand_inkomen",
+    "overgewicht_totaal",
+    "ernstig_overgewicht"
+  ),
+  Type = c(
+    "Character",
+    "Numeric",
+    "Numeric",
+    "Numeric",
+    "Numeric"
+  ),
+  Meaning = c(
+    "Municipality",
+    "Measurement year",
+    "Average standardised household income in thousands of euros",
+    "Percentage of residents with a BMI of 25 or higher",
+    "Percentage of residents with a BMI of 30 or higher"
+  )
+)
+
+knitr::kable(
+  variable_table,
+  caption = "Variables included in the merged dataset"
+)
+```
+
+# Part 3 - Quantifying
+
+## 3.1 Data cleaning
+The original CBS files had metadata rows above the actual data, and the structure was slightly different across the four years. These rows had to be skipped when loading each file. After that we selected the variables we needed and renamed them so they were consistent across years. We kept only the observations for Amsterdam, Groningen, Maastricht and Utrecht, and added a year variable to each dataset so we could tell them apart later.
+The four income datasets were then combined into one, and the four overweight datasets were combined separately into another. Once we kept only the variables that were available for every year, the income and overweight data were merged together using municipality and year as the matching variables.
+
+
+```{r clean-income, include=FALSE}
+cities <- c(
+  "Amsterdam",
+  "Groningen (gemeente)",
+  "Maastricht",
+  "Utrecht (gemeente)"
+)
+
+income_names <- c(
+  "regio",
+  "huishoudens_x1000",
+  "huishoudens_relatief",
+  "gem_gestand_inkomen",
+  "mediaan_gestand_inkomen",
+  "gem_besteedbaar_inkomen",
+  "mediaan_besteedbaar_inkomen"
+)
+
+Inkomen2012 <- read_csv2(
+  "data/Inkomen2012.csv",
+  skip = 7,
+  n_max = 5,
+  col_names = income_names,
+  show_col_types = FALSE
+) %>%
+  filter(regio %in% cities) %>%
+  mutate(jaar = 2012)
+
+Inkomen2016 <- read_csv2(
+  "data/Inkomen2016.csv",
+  skip = 7,
+  n_max = 5,
+  col_names = income_names,
+  show_col_types = FALSE
+) %>%
+  filter(regio %in% cities) %>%
+  mutate(jaar = 2016)
+
+Inkomen2020 <- read_csv2(
+  "data/Inkomen2020.csv",
+  skip = 7,
+  n_max = 5,
+  col_names = income_names,
+  show_col_types = FALSE
+) %>%
+  filter(regio %in% cities) %>%
+  mutate(jaar = 2020)
+
+Inkomen2022 <- read_csv2(
+  "data/Inkomen2022.csv",
+  skip = 7,
+  n_max = 5,
+  col_names = income_names,
+  show_col_types = FALSE
+) %>%
+  filter(regio %in% cities) %>%
+  mutate(jaar = 2022)
+```
+
+
+```{r clean-overweight-2012-2016, include=FALSE}
+Overgewicht2012 <- read_csv2(
+  "data/Overgewicht2012.csv",
+  skip = 6,
+  n_max = 4,
+  col_names = c(
+    "leeftijd",
+    "regio",
+    "overgewicht_totaal",
+    "ernstig_overgewicht"
+  ),
+  show_col_types = FALSE
+) %>%
+  filter(regio %in% cities) %>%
+  mutate(jaar = 2012)
+
+Overgewicht2016 <- read_csv2(
+  "data/Overgewicht2016.csv",
+  skip = 6,
+  n_max = 4,
+  col_names = c(
+    "leeftijd",
+    "regio",
+    "ondergewicht",
+    "gezond_gewicht",
+    "overgewicht_totaal",
+    "matig_overgewicht",
+    "ernstig_overgewicht"
+  ),
+  show_col_types = FALSE
+) %>%
+  filter(regio %in% cities) %>%
+  mutate(jaar = 2016)
+```
+
+```{r clean-overweight-2020-2022, include=FALSE}
+Overgewicht2020_raw <- read_csv2(
+  "data/Overgewicht2020.csv",
+  skip = 6,
+  n_max = 5,
+  col_names = FALSE,
+  show_col_types = FALSE
+)
+
+Overgewicht2022_raw <- read_csv2(
+  "data/Overgewicht2022.csv",
+  skip = 6,
+  n_max = 5,
+  col_names = FALSE,
+  show_col_types = FALSE
+)
+
+Overgewicht2020 <- Overgewicht2020_raw %>%
+  transmute(
+    regio = X1,
+    jaar = 2020,
+    overgewicht_totaal = X4,
+    ernstig_overgewicht = X6
+  ) %>%
+  filter(regio %in% cities)
+
+Overgewicht2022 <- Overgewicht2022_raw %>%
+  transmute(
+    regio = X1,
+    jaar = 2022,
+    overgewicht_totaal = X4,
+    ernstig_overgewicht = X6
+  ) %>%
+  filter(regio %in% cities)
+```
+
+
+
+```{r combine-years, include=FALSE}
+income_all <- bind_rows(
+  Inkomen2012,
+  Inkomen2016,
+  Inkomen2020,
+  Inkomen2022
+)
+
+overweight_all <- bind_rows(
+  Overgewicht2012 %>%
+    select(regio, jaar, overgewicht_totaal, ernstig_overgewicht),
+
+  Overgewicht2016 %>%
+    select(regio, jaar, overgewicht_totaal, ernstig_overgewicht),
+
+  Overgewicht2020,
+  Overgewicht2022
+)
+```
+
+
+```{r merge-data, include=FALSE}
+data_clean <- income_all %>%
+  select(regio, jaar, gem_gestand_inkomen) %>%
+  inner_join(
+    overweight_all,
+    by = c("regio", "jaar")
+  ) %>%
+  arrange(regio, jaar)
+```
+
+
+
+```{r check-clean-data, include=FALSE}
+dim(data_clean)
+
+sum(is.na(data_clean))
+
+data_clean %>%
+  count(regio, jaar) %>%
+  filter(n > 1)
+```
+The resulting dataset has 16 observations and five variables, each row being one municipality in one measurement year. We checked it for missing values and duplicate municipality-year combinations afterwards. None were found.
+So in short, the cleaned dataset contains 16 observations and five variables, with no missing values or duplicates.
+
+## 3.2 Generate necessary variables
+We created two new variables for the temporal and event analyses.
+The first; `covid_period`, splits the observations into before the COVID-19 pandemic and from 2020 onwards. 2012 and 2016 are classified as "Before COVID-19," while 2020 and 2022 fall under "2020 and after."
+The second variable; `overweight_change_pp`, measures how much total overweight prevalence changed compared to that same municipality's value in 2012, expressed in percentage points. This way it's possible to compare development across the four municipalities even though they started from different levels.
+
+
+
+```{r create-variables, include=FALSE}
+data_analysis <- data_clean %>%
+  group_by(regio) %>%
+  arrange(jaar, .by_group = TRUE) %>%
+  mutate(
+    covid_period = if_else(
+      jaar < 2020,
+      "Before COVID-19",
+      "2020 and after"
+    ),
+    overweight_change_pp =
+      overgewicht_totaal -
+      overgewicht_totaal[jaar == 2012]
+  ) %>%
+  ungroup()
+```
+
+For every municipality `overweight_change_pp` is zero in 2012, since that's the reference year. A positive value means overweight prevalence went up relative to 2012, a negative one means it went down. The `covid_period` variable is what gets used later in the event analysis.
+
+
+## 3.3 Visualize temporal variation
+The figure below shows how total overweight prevalence developed in Amsterdam, Groningen, Maastricht and Utrecht between 2012 and 2022.
+
+```{r temporal-variation, fig.width=7, fig.height=4}
+ggplot(
+  data_analysis,
+  aes(
+  x = jaar,
+  y = overgewicht_totaal,
+  color = str_remove(regio, " \\(gemeente\\)$"),
+  group = regio
+)
+) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 3) +
+  scale_x_continuous(
+    breaks = c(2012, 2016, 2020, 2022)
+  ) +
+  labs(
+    title = "Overweight prevalence by municipality, 2012–2022",
+    x = "Year",
+    y = "Population with overweight (%)",
+    color = "Municipality",
+    caption = "Source: CBS Health Monitor"
+  ) +
+  theme_minimal()
+```
+
+Overweight prevalence developed quite differently across the four municipalities. Maastricht had the highest prevalence the entire time, staying relatively stable around 45%. Groningen showed the clearest continuous rise, going from 36.7% in 2012 up to 40.1% in 2022. Amsterdam stayed fairly flat until 2020, after which it increased to 41.2% by 2022. Utrecht actually declined between 2012 and 2016, then rose a little again, but even by 2022 it was still below where it started in 2012.
+So overall there wasn't one single trend that all four municipalities followed. These differences probably point to local socioeconomic, demographic and health-related factors playing a role over time, although we can't say exactly which ones from this data alone.
+
+
+## 3.4 Visualize spatial variation
+The map below shows the spatial distribution of overweight prevalence across the four selected municipalities in 2022. The municipal boundaries of the four selected municipalities are coloured according to their overweight prevalence.
+```{r spatial-map, fig.width=6.5, fig.height=5, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(sf)
+
+options(timeout = 300)
+
+# Download de gemeentegrenzen van Nederland in 2022
+pdok_url <- paste0(
+  "https://api.pdok.nl/cbs/wijken-en-buurten-2022/",
+  "ogc/v1/collections/gemeenten/items?f=json&limit=1000"
+)
+
+geojson_file <- tempfile(fileext = ".geojson")
+
+download.file(
+  url = pdok_url,
+  destfile = geojson_file,
+  mode = "wb",
+  quiet = TRUE
+)
+
+# Lees de gemeentegrenzen in
+gemeenten <- st_read(
+  geojson_file,
+  quiet = TRUE
+) %>%
+  st_transform(4326) %>%
+  select(
+    gemeentecode,
+    gemeentenaam,
+    geometry
+  )
+
+# Selecteer de overgewichtscijfers van 2022
+# De gemeentecodes voorkomen problemen met verschillende schrijfwijzen
+city_2022 <- data_analysis %>%
+  filter(jaar == 2022) %>%
+  transmute(
+    gemeentecode = case_when(
+      regio == "Amsterdam" ~ "GM0363",
+      str_detect(regio, "^Groningen") ~ "GM0014",
+      regio == "Maastricht" ~ "GM0935",
+      str_detect(regio, "^Utrecht") ~ "GM0344"
+    ),
+    city_name = str_remove(
+      regio,
+      " \\(gemeente\\)$"
+    ),
+    overgewicht_totaal
+  )
+
+# Voeg de overgewichtscijfers toe aan de vier gemeentegrenzen
+selected_municipalities <- gemeenten %>%
+  inner_join(
+    city_2022,
+    by = "gemeentecode"
+  )
+
+# Posities voor duidelijke labels
+label_positions <- tribble(
+  ~gemeentecode, ~city_long, ~city_lat, ~label_long, ~label_lat,
+  "GM0363",       4.90,       52.37,     4.10,        52.55,
+  "GM0014",       6.57,       53.22,     5.55,        53.40,
+  "GM0935",       5.69,       50.85,     4.70,        50.75,
+  "GM0344",       5.12,       52.09,     5.75,        51.92
+) %>%
+  left_join(
+    city_2022,
+    by = "gemeentecode"
+  ) %>%
+  mutate(
+    city_label = paste0(
+      city_name,
+      "\n",
+      sprintf("%.1f%%", overgewicht_totaal)
+    )
+  )
+
+# Maak de kaart
+ggplot() +
+  geom_sf(
+    data = gemeenten,
+    fill = "grey92",
+    color = "white",
+    linewidth = 0.1
+  ) +
+  geom_sf(
+    data = selected_municipalities,
+    aes(fill = overgewicht_totaal),
+    color = "black",
+    linewidth = 0.7
+  ) +
+  geom_segment(
+    data = label_positions,
+    aes(
+      x = city_long,
+      y = city_lat,
+      xend = label_long,
+      yend = label_lat
+    ),
+    color = "grey35",
+    linewidth = 0.4
+  ) +
+  geom_label(
+    data = label_positions,
+    aes(
+      x = label_long,
+      y = label_lat,
+      label = city_label
+    ),
+    size = 3.2,
+    fill = "white",
+    label.size = 0.2
+  ) +
+  scale_fill_viridis_c(
+    name = "Overweight (%)",
+    option = "C",
+    direction = -1
+  ) +
+  coord_sf(
+    crs = st_crs(4326),
+    default_crs = st_crs(4326),
+    xlim = c(3.2, 7.3),
+    ylim = c(50.65, 53.65),
+    expand = FALSE
+  ) +
+ labs(
+  title = "Overweight prevalence in four Dutch municipalities",
+  subtitle = "Percentage of adults with a BMI of 25 or higher, 2022",
+  caption = "Sources: CBS Health Monitor and CBS/PDOK"
+) +
+theme_void() +
+theme(
+  panel.background = element_rect(
+    fill = "lightblue",
+    color = NA
+  ),
+  plot.title = element_text(face = "bold"),
+  legend.position = "right"
+)
+```
+
+In 2022, Maastricht had the highest overweight prevalence of the four, at 45.3%, while Utrecht had the lowest, at 37.4%. Amsterdam and Groningen were in between, at 41.2% and 40.1% respectively.
+The map only colours in the boundaries for Amsterdam, Groningen, Maastricht and Utrecht. Every other Dutch municipality is shown in grey, so this map doesn't give a full picture of spatial variation across the whole country, it's limited to just these four.
+
+## 3.5 Visualize sub-population variation
+This section compares two BMI-based groups within the overweight population: moderate overweight and severe overweight. Moderate overweight is calculated by taking total overweight prevalence and subtracting severe overweight prevalence from it.
+
+```{r subpopulation-variation, fig.width=7, fig.height=4}
+subpopulation_2022 <- data_analysis %>%
+  filter(jaar == 2022) %>%
+  transmute(
+    municipality = str_remove(regio, " \\(gemeente\\)$"),
+    `Moderate overweight` =
+      overgewicht_totaal - ernstig_overgewicht,
+    `Severe overweight` =
+      ernstig_overgewicht
+  ) %>%
+  pivot_longer(
+    cols = c(
+      `Moderate overweight`,
+      `Severe overweight`
+    ),
+    names_to = "weight_category",
+    values_to = "percentage"
+  )
+
+ggplot(
+  subpopulation_2022,
+  aes(
+    x = municipality,
+    y = percentage,
+    fill = weight_category
+  )
+) +
+  geom_col() +
+  geom_text(
+    aes(label = paste0(round(percentage, 1), "%")),
+    position = position_stack(vjust = 0.5),
+    size = 3.5
+  ) +
+  labs(
+    title = "Composition of overweight prevalence by municipality",
+    subtitle = "Moderate and severe overweight in 2022",
+    x = "Municipality",
+    y = "Population (%)",
+    fill = "Weight category",
+    caption = "Source: CBS Health Monitor"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "right"
+  )
+```
+
+Maastricht had the highest total overweight prevalence in 2022, and also the highest severe overweight prevalence. Utrecht was the lowest in both categories. Amsterdam and Groningen looked fairly similar to each other.
+In all four municipalities, moderate overweight was the bigger share of total overweight prevalence. That said, severe overweight was still a substantial part of the total, especially in Maastricht. Small differences between our calculated components and the published totals can happen because CBS rounds its percentages.
+
+## 3.6 Event analysis
+The COVID-19 pandemic is the event used in this analysis. 2012 and 2016 represent the period before COVID-19, and 2020 and 2022 represent the period from the start of the pandemic onwards.
+The figure below shows how overweight prevalence changed relative to each municipality’s 2012 level. The dashed vertical line marks the beginning of the COVID-19 period in 2020.
+
+
+```{r event-analysis, fig.width=7, fig.height=4, echo=FALSE, warning=FALSE, message=FALSE}
+event_data <- data_analysis %>%
+  mutate(
+    municipality = str_remove(
+      regio,
+      " \\(gemeente\\)$"
+    ),
+    covid_period = factor(
+      covid_period,
+      levels = c(
+        "Before COVID-19",
+        "2020 and after"
+      )
+    )
+  )
+
+ggplot(
+  event_data,
+  aes(
+    x = jaar,
+    y = overweight_change_pp,
+    color = municipality,
+    group = municipality
+  )
+) +
+  geom_hline(
+    yintercept = 0,
+    color = "grey60",
+    linewidth = 0.5
+  ) +
+  geom_vline(
+    xintercept = 2020,
+    linetype = "dashed",
+    linewidth = 0.8
+  ) +
+  geom_line(
+    linewidth = 1
+  ) +
+  geom_point(
+    size = 3
+  ) +
+  annotate(
+    "text",
+    x = 2020.15,
+    y = max(event_data$overweight_change_pp) + 0.2,
+    label = "Beginning of COVID-19 period",
+    hjust = 0,
+    size = 3.3
+  ) +
+  scale_x_continuous(
+    breaks = c(2012, 2016, 2020, 2022)
+  ) +
+  labs(
+    title = "Change in overweight prevalence around the COVID-19 period",
+    subtitle = "Change compared with each municipality's 2012 level",
+    x = "Year",
+    y = "Change in overweight prevalence (percentage points)",
+    color = "Municipality",
+    caption = "Source: CBS Health Monitor"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "right"
+  )
+```
+
+To compare the periods more directly, the average overweight prevalence before COVID-19 and from 2020 onwards was calculated for each municipality.
+
+```{r event-summary-table}
+event_summary <- event_data %>%
+  group_by(
+    municipality,
+    covid_period
+  ) %>%
+  summarise(
+    mean_overweight = mean(overgewicht_totaal),
+    .groups = "drop"
+  ) %>%
+  pivot_wider(
+    names_from = covid_period,
+    values_from = mean_overweight
+  ) %>%
+  mutate(
+    change_percentage_points =
+      `2020 and after` - `Before COVID-19`
+  )
+
+knitr::kable(
+  event_summary,
+  digits = 2,
+  col.names = c(
+    "Municipality",
+    "Before COVID-19 (%)",
+    "From 2020 onwards (%)",
+    "Change (percentage points)"
+  ),
+  align = c("l", "r", "r", "r"),
+  caption = "Average overweight prevalence before COVID-19 and from 2020 onwards"
+)
+```
+
+The results show the development differed quite a bit between municipalities. Groningen had the largest increase, its average prevalence was about 2.35 percentage points higher in 2020 and 2022 compared to 2012 and 2016. Amsterdam also went up, by around 0.55 percentage points. Maastricht and Utrecht barely changed.
+These shifts happened around the same time as COVID-19, but that doesn't mean the pandemic caused them, it's important not to jump to that conclusion. We only have four measurement years, with just two observations per period for each municipality, so other factors like demographic change, local policy, inflation or lifestyle shifts could easily be behind some of this instead.
+
+### Overall relationship between income and overweight
+```{r overall-correlation, include=FALSE}
+correlation_result <- cor.test(
+  data_analysis$gem_gestand_inkomen,
+  data_analysis$overgewicht_totaal,
+  method = "spearman",
+  exact = FALSE
+)
+```
+
+The Spearman correlation between average standardised household income and overweight prevalence was 0.09 (*p* = .753, *n* = 16). This indicates a very weak and statistically non-significant association. The dataset therefore provides no evidence of a clear overall relationship between the two variables.
+
+# Part 4 – Discussion
+
+## 4.1 Discuss the findings
+This study looked at the association between average standardised household income and overweight prevalence in four Dutch municipalities between 2012 and 2022. The results did not support our expectation that municipalities with lower income would also have higher overweight prevalence. The Spearman correlation was very weak and not statistically significant (*r*s = 0.09, *p* = .753).
+That doesn't necessarily mean previous research showing a link between income and overweight at the individual level is wrong. Our analysis uses municipal averages not individual-level data, so a municipality with a high average income can still have lower-income neighbourhoods where being overweight is more common. So a relationship that exists at the individual level might simply not be visible once you average everything up to the municipal level.
+There were however clear differences between municipalities and across time. Maastricht had the highest overweight prevalence throughout the whole period, and Groningen showed the largest increase. Amsterdam's increase was concentrated between 2020 and 2022 in particular. Utrecht was the only municipality that ended the period below where it started in 2012. The geographic pattern in the 2022 map matched this, Maastricht highest and Utrecht lowest.
+The event analysis showed that average overweight prevalence was higher from 2020 onwards in Groningen, and to a lesser degree in Amsterdam, while Maastricht and Utrecht stayed roughly the same. It's important to be careful here though: this is not evidence that COVID-19 caused these changes. There are only two observations before 2020 and two after for each municipality, and other things like demographic shifts, behaviour changes or new policies could just as easily explain it.
+A few limitations are worth repeating. The dataset only has 16 city-year observations in total, the same four municipalities appear repeatedly, and income was not corrected for inflation, which matters over a ten-year window. The Health Monitor data is also self-reported through questionnaires, so sampling error and reporting bias are both possible. And again, conclusions about individual people can't really be drawn from city-level averages.
+So overall, we found real differences in overweight prevalence between the municipalities, but not a clear relationship with income at the city level. Future research with more municipalities, inflation-adjusted income figures and individual or neighbourhood-level data would likely give a clearer picture.
+
+
+# Part 5 – Reproducibility
+
+## 5.1 GitHub repository link
+
+The complete project is available in the following public GitHub repository:
+
+[Open the public GitHub repository](https://github.com/Baytrade/Group-4-Programming-for-economists)
+
+## 5.2 How to reproduce the project
+
+The repository contains the RMarkdown report, the required CBS datasets, the `renv.lock` file and a `run_all.R` script. To reproduce the analysis, the repository can be downloaded or cloned and opened using the included RStudio project file.
+
+The required package versions can be restored and the complete report can be rendered by running `source("run_all.R")` in the R Console. The README provides the exact data sources, required filenames and reproduction instructions. An internet connection is required because the municipality boundaries are downloaded from the PDOK API.
+
+## 5.3 Reference list
+Centraal Bureau voor de Statistiek. (n.d.). *Gezondheidsmonitor; regio, bevolking van 19 jaar of ouder, 2012* [Data set]. CBS StatLine. https://www.cbs.nl/nl-nl/cijfers/detail/82166NED
+
+Centraal Bureau voor de Statistiek. (n.d.). *Gezondheidsmonitor; bevolking van 19 jaar of ouder, regio, 2016* [Data set]. CBS StatLine. https://www.cbs.nl/nl-nl/cijfers/detail/83674NED
+
+Centraal Bureau voor de Statistiek. (n.d.). *Gezondheidsmonitor; bevolking van 18 jaar of ouder, regio, 2020* [Data set]. CBS StatLine. https://www.cbs.nl/nl-nl/cijfers/detail/85012NED
+
+Centraal Bureau voor de Statistiek. (n.d.). *Gezondheidsmonitor; bevolking van 18 jaar of ouder, regio, 2022* [Data set]. CBS StatLine. https://www.cbs.nl/nl-nl/cijfers/detail/85563NED
+
+Centraal Bureau voor de Statistiek. (n.d.). *Inkomen van huishoudens; huishoudenskenmerken, regio* [Data set]. CBS StatLine. https://www.cbs.nl/nl-nl/cijfers/detail/86161NED
+
+Centraal Bureau voor de Statistiek. (2022, October 4). *Meer obesitas en diabetes bij volwassenen met armoederisico*. https://www.cbs.nl/nl-nl/nieuws/2022/40/meer-obesitas-en-diabetes-bij-volwassenen-met-armoederisico
+
+Publieke Dienstverlening Op de Kaart. (n.d.). *CBS Wijken en Buurten 2022: Gemeenten* [Data set]. https://api.pdok.nl/cbs/wijken-en-buurten-2022/ogc/v1/collections/gemeenten
+
+Rijksinstituut voor Volksgezondheid en Milieu. (2024, March 4). *Obesitas verdrievoudigd in de afgelopen 40 jaar*. https://www.rivm.nl/nieuws/obesitas-verdrievoudigd-in-afgelopen-40-jaar
+
+World Health Organization. (2020, March 11). *WHO Director-General’s opening remarks at the media briefing on COVID-19 – 11 March 2020*. https://www.who.int/news-room/speeches/item/who-director-general-s-opening-remarks-at-the-media-briefing-on-covid-19---11-march-2020
+
