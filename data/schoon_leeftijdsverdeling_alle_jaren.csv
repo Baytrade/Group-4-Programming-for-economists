@@ -1,0 +1,49 @@
+Stad,Periode,Leeftijdsgroep,Percentage
+Amsterdam,2012,< 15 jaar,15.700000000000001
+Amsterdam,2016,< 15 jaar,15.3
+Amsterdam,2020,< 15 jaar,14.399999999999999
+Amsterdam,2022,< 15 jaar,13.8
+Groningen,2012,< 15 jaar,12.700000000000001
+Groningen,2016,< 15 jaar,12.2
+Groningen,2020,< 15 jaar,12.4
+Groningen,2022,< 15 jaar,12.0
+Maastricht,2012,< 15 jaar,11.8
+Maastricht,2016,< 15 jaar,10.9
+Maastricht,2020,< 15 jaar,10.3
+Maastricht,2022,< 15 jaar,10.4
+Utrecht,2012,< 15 jaar,17.2
+Utrecht,2016,< 15 jaar,17.4
+Utrecht,2020,< 15 jaar,16.9
+Utrecht,2022,< 15 jaar,16.6
+Amsterdam,2012,15 tot 65 jaar,72.9
+Amsterdam,2016,15 tot 65 jaar,72.80000000000001
+Amsterdam,2020,15 tot 65 jaar,73.0
+Amsterdam,2022,15 tot 65 jaar,73.1
+Groningen,2012,15 tot 65 jaar,75.9
+Groningen,2016,15 tot 65 jaar,75.6
+Groningen,2020,15 tot 65 jaar,73.0
+Groningen,2022,15 tot 65 jaar,72.6
+Maastricht,2012,15 tot 65 jaar,69.7
+Maastricht,2016,15 tot 65 jaar,69.0
+Maastricht,2020,15 tot 65 jaar,67.9
+Maastricht,2022,15 tot 65 jaar,67.5
+Utrecht,2012,15 tot 65 jaar,72.8
+Utrecht,2016,15 tot 65 jaar,72.4
+Utrecht,2020,15 tot 65 jaar,72.60000000000001
+Utrecht,2022,15 tot 65 jaar,72.8
+Amsterdam,2012,≥ 65 jaar,11.3
+Amsterdam,2016,≥ 65 jaar,12.0
+Amsterdam,2020,≥ 65 jaar,12.7
+Amsterdam,2022,≥ 65 jaar,13.2
+Groningen,2012,≥ 65 jaar,11.399999999999999
+Groningen,2016,≥ 65 jaar,12.1
+Groningen,2020,≥ 65 jaar,14.7
+Groningen,2022,≥ 65 jaar,15.299999999999999
+Maastricht,2012,≥ 65 jaar,18.6
+Maastricht,2016,≥ 65 jaar,20.0
+Maastricht,2020,≥ 65 jaar,21.6
+Maastricht,2022,≥ 65 jaar,22.3
+Utrecht,2012,≥ 65 jaar,10.0
+Utrecht,2016,≥ 65 jaar,10.1
+Utrecht,2020,≥ 65 jaar,10.5
+Utrecht,2022,≥ 65 jaar,10.7

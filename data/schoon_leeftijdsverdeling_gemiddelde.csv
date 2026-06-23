@@ -1,0 +1,13 @@
+Stad,Leeftijdsgroep,Percentage
+Amsterdam,< 15 jaar,14.8
+Groningen,< 15 jaar,12.3
+Maastricht,< 15 jaar,10.9
+Utrecht,< 15 jaar,17.0
+Amsterdam,15 tot 65 jaar,73.0
+Groningen,15 tot 65 jaar,74.3
+Maastricht,15 tot 65 jaar,68.5
+Utrecht,15 tot 65 jaar,72.6
+Amsterdam,≥ 65 jaar,12.3
+Groningen,≥ 65 jaar,13.4
+Maastricht,≥ 65 jaar,20.6
+Utrecht,≥ 65 jaar,10.3
